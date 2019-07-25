@@ -8,6 +8,8 @@ var cors = require('cors');
 
 // body parser required
 var bodyParser = require('body-parser');
+// dns required
+var dns = require('dns');
 
 var app = express();
 
@@ -22,6 +24,7 @@ app.use(cors());
 /** this project needs to parse POST bodies **/
 // you should mount the body-parser here
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/public', express.static(process.cwd() + '/public'));
 
@@ -38,8 +41,17 @@ app.get("/api/hello", function (req, res) {
 
 
 app.post("/api/shorturl/new",function(req, res){
-  //teste
-  res.json({original_url: req.url, short_url: 'short'});
+  var originalURL = String(req.body.url); // how to get this as a string
+  dns.lookup(originalURL,function(err,address,family){
+    
+    if(err){
+      // it's generating an error
+      res.json({error: 'invalid URL'});
+    }else{
+      res.json({original_url: address, short_url: 1});
+    }
+  });
+  
 });
 
 app.listen(port, function () {
