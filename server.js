@@ -1,8 +1,8 @@
 'use strict';
 
-var express = require('express');
-var mongo = require('mongodb');
-var mongoose = require('mongoose');
+const express = require('express');
+const mongo = require('mongodb');
+const mongoose = require('mongoose');
 
 var cors = require('cors');
 
@@ -16,18 +16,20 @@ var app = express();
 // Basic Configuration 
 var port = process.env.PORT || 3000;
 
-/** this project needs a db !! **/ 
-// mongoose.connect(process.env.MONGOLAB_URI);
+// mongodb connection
+mongoose.connect(process.env.MONGOLAB_URI);
+// create the schema to save the website and the short url
 
 app.use(cors());
 
-/** this project needs to parse POST bodies **/
-// you should mount the body-parser here
+// mount body parser
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/public', express.static(process.cwd() + '/public'));
 
+/* ROUTES */
+// GET routes
 app.get('/', function(req, res){
   res.sendFile(process.cwd() + '/views/index.html');
 });
@@ -38,21 +40,22 @@ app.get("/api/shorturl/:id",function(req, res){
   res.send("You shouldn't be seeing this!");
 });
   
+// POST Routes
 app.post("/api/shorturl/new",function(req, res){
   // steps
   // get the website from the post form
   // show the json response 
   // save in the database in the same format
   
-  //not working  properly yet
-  var originalURL = req.body.url; 
+  var originalURL = req.body.url.split('/')[2]; 
   dns.lookup(originalURL,function(err,address,family){
-    
+    // verify the pattern here
+    // verify https and the slash routes
     if(err){
       // it's generating an error
       res.json({error: 'invalid URL'});
     }else{
-      res.json({original_url: address, short_url: 1});
+      res.json({original_url: originalURL, short_url: 1});
     }
   });
   
