@@ -32,16 +32,20 @@ app.get('/', function(req, res){
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
-  
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  // incomplete
-  res.json({greeting: req.protocol + req.host + req.originalUrl});
+app.get("/api/shorturl/:id",function(req, res){
+  // check the id in the database and then redirect 
+  // the webside will be save in the same pattern as the json
+  res.send("You shouldn't be seeing this!");
 });
-
-
+  
 app.post("/api/shorturl/new",function(req, res){
-  var originalURL = String(req.body.url); // how to get this as a string
+  // steps
+  // get the website from the post form
+  // show the json response 
+  // save in the database in the same format
+  
+  //not working  properly yet
+  var originalURL = req.body.url; 
   dns.lookup(originalURL,function(err,address,family){
     
     if(err){
