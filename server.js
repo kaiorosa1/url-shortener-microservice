@@ -7,11 +7,11 @@ const mongoose = require('mongoose');
 var cors = require('cors');
 
 // body parser required
-var bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
 // dns required
-var dns = require('dns');
+const dns = require('dns');
 
-var app = express();
+const app = express();
 
 // Basic Configuration 
 var port = process.env.PORT || 3000;
@@ -19,6 +19,12 @@ var port = process.env.PORT || 3000;
 // mongodb connection
 mongoose.connect(process.env.MONGOLAB_URI);
 // create the schema to save the website and the short url
+const Schema = mongoose.Schema({
+  original_url: String,
+  short_url: Number
+});
+// Short Model
+const Short = mongoose.model('Short',Schema);
 
 app.use(cors());
 
