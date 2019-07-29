@@ -25,6 +25,7 @@ const Schema = mongoose.Schema({
 });
 // Short Model
 const Short = mongoose.model('Short',Schema);
+var urlShort;
 
 app.use(cors());
 
@@ -44,6 +45,14 @@ app.get("/api/shorturl/:id",function(req, res){
   // check the id in the database and then redirect 
   // the webside will be save in the same pattern as the json
   res.send("You shouldn't be seeing this!");
+  // not working yet
+  Short.find({short_url: 2},function(err,data){
+    if(err){
+      return err; 
+    }else{
+      console.log(data);
+    }
+  });
 });
   
 // POST Routes
@@ -61,7 +70,17 @@ app.post("/api/shorturl/new",function(req, res){
       // it's generating an error
       res.json({error: 'invalid URL'});
     }else{
-      res.json({original_url: originalURL, short_url: 1});
+      res.json({original_url: originalURL, short_url: 2});
+      // not working yet
+      Short.create({original_url: req.body.url, short_url: 2},function(err,data){
+        if(err){
+          return err;
+          console.log(err);
+        }else{
+          console.log("Saved with success!");
+        }
+      });
+      
     }
   });
   
