@@ -19,13 +19,12 @@ var port = process.env.PORT || 3000;
 // mongodb connection
 mongoose.connect(process.env.MONGOLAB_URI);
 // create the schema to save the website and the short url
-const Schema = mongoose.Schema({
+const Schema = new mongoose.Schema({
   original_url: String,
   short_url: Number
 });
 // Short Model
 const Short = mongoose.model('Short',Schema);
-var urlShort;
 
 app.use(cors());
 
@@ -46,13 +45,13 @@ app.get("/api/shorturl/:id",function(req, res){
   // the webside will be save in the same pattern as the json
   res.send("You shouldn't be seeing this!");
   // not working yet
-  Short.find({short_url: 2},function(err,data){
-    if(err){
-      return err; 
-    }else{
-      console.log(data);
-    }
-  });
+  // Short.find({short_url: 2},function(err,data){
+  //   if(err){
+  //     return err; 
+  //   }else{
+  //     console.log(data);
+  //   }
+  // });
 });
   
 // POST Routes
@@ -72,14 +71,23 @@ app.post("/api/shorturl/new",function(req, res){
     }else{
       res.json({original_url: originalURL, short_url: 2});
       // not working yet
-      Short.create({original_url: req.body.url, short_url: 2},function(err,data){
-        if(err){
-          return err;
-          console.log(err);
-        }else{
-          console.log("Saved with success!");
-        }
-      });
+      
+//       console.log(Short);
+//       Short.find({},function(err,data){
+//         if(err){
+//           console.log(err);
+//         }else{
+//           console.log("here");
+          
+//         }
+//       });
+      // Short.create({original_url: String(req.body.url), short_url: 3},function(err){
+      //   if(err){
+      //     console.log(err);
+      //   }else{
+      //     console.log("Saved with success!");
+      //   }
+      // });
       
     }
   });
