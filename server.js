@@ -19,12 +19,12 @@ var port = process.env.PORT || 3000;
 // mongodb connection
 mongoose.connect(process.env.MONGOLAB_URI);
 // create the schema to save the website and the short url
-const Schema = new mongoose.Schema({
+var Schema = new mongoose.Schema({
   original_url: String,
   short_url: Number
 });
 // Short Model
-const Short = mongoose.model('Short',Schema);
+var Short = mongoose.model('Short',Schema);
 
 app.use(cors());
 
@@ -70,8 +70,14 @@ app.post("/api/shorturl/new",function(req, res){
       res.json({error: 'invalid URL'});
     }else{
       res.json({original_url: originalURL, short_url: 2});
-      // not working yet
-      
+      // saving
+      var url_short = new Short({original_url: originalURL, short_url: 2});
+      url_short.save(function(err,data){
+        if(err){
+          console.log(err);
+        }
+      });
+      // find now working
 //       console.log(Short);
 //       Short.find({},function(err,data){
 //         if(err){
@@ -81,13 +87,7 @@ app.post("/api/shorturl/new",function(req, res){
           
 //         }
 //       });
-      // Short.create({original_url: String(req.body.url), short_url: 3},function(err){
-      //   if(err){
-      //     console.log(err);
-      //   }else{
-      //     console.log("Saved with success!");
-      //   }
-      // });
+     
       
     }
   });
