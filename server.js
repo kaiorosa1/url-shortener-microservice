@@ -3,7 +3,7 @@
 const express = require('express');
 const mongo = require('mongodb');
 const mongoose = require('mongoose');
-
+const Schema = mongoose.Schema;
 var cors = require('cors');
 
 // body parser required
@@ -19,12 +19,12 @@ var port = process.env.PORT || 3000;
 // mongodb connection
 mongoose.connect(process.env.MONGOLAB_URI);
 // create the schema to save the website and the short url
-var Schema = new mongoose.Schema({
+var schema = new Schema({
   original_url: String,
   short_url: Number
 });
 // Short Model
-var Short = mongoose.model('Short',Schema);
+var Short = mongoose.model('Short',schema);
 
 app.use(cors());
 
@@ -43,15 +43,16 @@ app.get('/', function(req, res){
 app.get("/api/shorturl/:id",function(req, res){
   // check the id in the database and then redirect 
   // the webside will be save in the same pattern as the json
-  res.send("You shouldn't be seeing this!");
-  // not working yet
-  // Short.find({short_url: 2},function(err,data){
-  //   if(err){
-  //     return err; 
-  //   }else{
-  //     console.log(data);
-  //   }
-  // });
+  // finding the website with the short url
+  Short.find({short_url: 2},function(err,data){
+    if(err){
+      return err; 
+    }else{
+      //retrieving the data from the DB and redirecting to the orignal link
+      res.status(301).redirect(data[0].original_url);
+      
+    }
+  });
 });
   
 // POST Routes
@@ -69,24 +70,17 @@ app.post("/api/shorturl/new",function(req, res){
       // it's generating an error
       res.json({error: 'invalid URL'});
     }else{
-      res.json({original_url: originalURL, short_url: 2});
+      // generate differente numbers to each website
       // saving
-      var url_short = new Short({original_url: originalURL, short_url: 2});
+      var url_short = new Short({original_url: req.body.url, short_url: 2});
+      console.log(url_short);
       url_short.save(function(err,data){
         if(err){
-          console.log(err);
+          return err;
         }
+        
       });
-      // find now working
-//       console.log(Short);
-//       Short.find({},function(err,data){
-//         if(err){
-//           console.log(err);
-//         }else{
-//           console.log("here");
-          
-//         }
-//       });
+      res.json({original_url: originalURL, short_url: 2});
      
       
     }
