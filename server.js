@@ -25,6 +25,7 @@ var schema = new Schema({
 });
 // Short Model
 var Short = mongoose.model('Short',schema);
+var counter = 1;
 
 app.use(cors());
 
@@ -42,7 +43,6 @@ app.get('/', function(req, res){
 
 app.get("/api/shorturl/:id",function(req, res){
   // check the id in the database and then redirect 
-  // the webside will be save in the same pattern as the json
   // finding the website with the short url
   Short.find({short_url: 2},function(err,data){
     if(err){
@@ -72,17 +72,21 @@ app.post("/api/shorturl/new",function(req, res){
     }else{
       // generate differente numbers to each website
       // saving
-      var url_short = new Short({original_url: req.body.url, short_url: 2});
-      console.log(url_short);
-      url_short.save(function(err,data){
+      Short.findOne({original_url: req.body.url},{upsert: true},function(err,data){
         if(err){
           return err;
+        }else{  
+         
+            res.json(data);
+          
+          // }else{
+          //   res.json({original_url: originalURL, short_url: counter});
+          //   counter++;
+          // }
         }
-        
       });
-      res.json({original_url: originalURL, short_url: 2});
-     
       
+     
     }
   });
   
