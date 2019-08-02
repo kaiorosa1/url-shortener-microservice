@@ -72,17 +72,28 @@ app.post("/api/shorturl/new",function(req, res){
     }else{
       // generate differente numbers to each website
       // saving
-      Short.findOne({original_url: req.body.url},{upsert: true},function(err,data){
+      Short.find({original_url: req.body.url},function(err,data){
         if(err){
           return err;
         }else{  
-         
-            res.json(data);
+           if(data !== null){
+             res.json({original_url: data[0].original_url, short_url: data[0].short_url});
+           }else{
+              res.json({original_url: originalURL, short_url: counter});
+               Short.create({original_url: req.body.url, short_url: counter},function(err,dt){
+               if(err){
+                 return err;
+               }
+               counter++;
+             });
+              
+             
+           }
+            
           
-          // }else{
-          //   res.json({original_url: originalURL, short_url: counter});
-          //   counter++;
-          // }
+          
+          
+        
         }
       });
       
