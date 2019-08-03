@@ -44,17 +44,16 @@ app.get('/', function(req, res){
 app.get("/api/shorturl/:id",function(req, res){
   // check the id in the database and then redirect 
   // finding the website with the short url
-  Short.find({short_url: req.params.id},function(err,data){
+  Short.find({short_url: String(req.params.id)},function(err,data){
     if(err){
       return err; 
     }else{
       //retrieving the data from the DB and redirecting to the orignal link
-      if(data!== null){
+      if(data[0] !== undefined){
         res.status(301).redirect(data[0].original_url);
       }else{
-        res.send("It's not a valid link");
-      }
-      
+        res.send("It's an invalid link");
+      } 
       
     }
   });
@@ -94,11 +93,9 @@ app.post("/api/shorturl/new",function(req, res){
                }
                counter++;
              });
-              
-             
+
            }
-               
-        
+
         }
       });
       
