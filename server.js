@@ -67,9 +67,11 @@ app.post("/api/shorturl/new",function(req, res){
   // save in the database in the same format
   
   // concatenate the complete url 
-  
-  var originalURL = req.body.url.split('/')[2]; 
-  
+  let originalURL = req.body.url.trim().split(''); 
+  // since we are removing 8 elements only https is valid
+  originalURL.splice(0,8);
+  originalURL = originalURL.join('');
+  console.log(originalURL);
   dns.lookup(originalURL,function(err,address,family){
     // verify the pattern here
     // verify https and the slash routes
@@ -83,7 +85,8 @@ app.post("/api/shorturl/new",function(req, res){
         if(err){
           return err;
         }else{  
-           if(data !== null){
+          // double check here!! 
+           if(data[0]!== undefined){
              res.json({original_url: data[0].original_url, short_url: data[0].short_url});
            }else{
               res.json({original_url: originalURL, short_url: counter});
@@ -100,7 +103,7 @@ app.post("/api/shorturl/new",function(req, res){
       });
       
      
-    }
+     }
   });
   
 });
