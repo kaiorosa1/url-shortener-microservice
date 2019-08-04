@@ -69,46 +69,50 @@ app.post("/api/shorturl/new",function(req, res){
   // concatenate the complete url 
   let originalURL = req.body.url.trim().split(''); 
   // since we are removing 8 elements only https is valid
-  originalURL.splice(0,8);
+  let removed = originalURL.splice(0,8);
+  removed = removed.join('');
   originalURL = originalURL.join('');
   // parse the url before doing the dns lookup
-  let urlParsed = url.parse(originalURL);
-  dns.lookup(urlParsed.hostname,function(err,address,family){
-    // verify the pattern here
-    // verify https and the slash routes
-    if(err){
-      // it's generating an error
-      res.json({error: 'invalid URL'});
-      console.log(err);
-    }else{
-      // generate differente numbers to each website
-      // saving
-      Short.find({original_url: req.body.url},function(err,data){
-        if(err){
-          return err;
-        }else{  
-          // double check here!! 
-           if(data[0]!== undefined){
-             res.json({original_url: data[0].original_url, short_url: data[0].short_url});
-           }else{
-               counter = (counter+req.body.url.length);
-              res.json({original_url: originalURL, short_url: counter});
-               Short.create({original_url: req.body.url, short_url: counter},function(err,dt){
-               if(err){
-                 return err;
-               }
-               counter++;
-             });
+  if(removed == "https://"){
+    let urlParsed = url.parse(originalURL);
+    dns.lookup(urlParsed.hostname,function(err,address,family){
+      // verify the pattern here
+      // verify https and the slash routes
+      if(err){
+        // it's generating an error
+        res.json({error: 'invalid URL'});
+      }else{
+        // generate differente numbers to each website
+        // saving
+        Short.find({original_url: req.body.url},function(err,data){
+          if(err){
+            return err;
+          }else{  
+            // double check here!! 
+             if(data[0]!== undefined){
+               res.json({original_url: data[0].original_url, short_url: data[0].short_url});
+             }else{
+                 counter = (counter+req.body.url.length);
+                res.json({original_url: originalURL, short_url: counter});
+                 Short.create({original_url: req.body.url, short_url: counter},function(err,dt){
+                 if(err){
+                   return err;
+                 }
+                 counter++;
+               });
 
-           }
+             }
 
-        }
-      });
+          }
+        });
       
      
      }
-  });
-  
+    });
+  }
+  else{
+    res.json({error: 'invalid URL'});
+  }
 });
 
 app.listen(port, function () {
