@@ -5,7 +5,7 @@ const mongo = require('mongodb');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 var cors = require('cors');
-
+var url = require('url');
 // body parser required
 const bodyParser = require('body-parser');
 // dns required
@@ -25,7 +25,7 @@ var schema = new Schema({
 });
 // Short Model
 var Short = mongoose.model('Short',schema);
-var counter = 1;
+var counter = Math.floor(Math.random()*10) + 1;
 
 app.use(cors());
 
@@ -71,13 +71,15 @@ app.post("/api/shorturl/new",function(req, res){
   // since we are removing 8 elements only https is valid
   originalURL.splice(0,8);
   originalURL = originalURL.join('');
-  console.log(originalURL);
-  dns.lookup(originalURL,function(err,address,family){
+  // parse the url before doing the dns lookup
+  let urlParsed = url.parse(originalURL);
+  dns.lookup(urlParsed.hostname,function(err,address,family){
     // verify the pattern here
     // verify https and the slash routes
     if(err){
       // it's generating an error
       res.json({error: 'invalid URL'});
+      console.log(err);
     }else{
       // generate differente numbers to each website
       // saving
@@ -89,6 +91,7 @@ app.post("/api/shorturl/new",function(req, res){
            if(data[0]!== undefined){
              res.json({original_url: data[0].original_url, short_url: data[0].short_url});
            }else{
+               counter = (counter+req.body.url.length);
               res.json({original_url: originalURL, short_url: counter});
                Short.create({original_url: req.body.url, short_url: counter},function(err,dt){
                if(err){
